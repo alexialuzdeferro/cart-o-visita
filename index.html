@@ -276,6 +276,31 @@
 
     .small{font-size:12px;color:var(--muted)}
 
+    .visit-counter{
+      color:rgba(255,255,255,0.5);
+      background:rgba(0,0,0,0.15);
+      padding:4px 10px;
+      border-radius:12px;
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .visit-counter .count{
+      font-weight:600;
+      color:rgba(255,255,255,0.7);
+    }
+
+    .visit-counter.loading .count{
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink{
+      0%,100%{opacity:0.3}
+      50%{opacity:1}
+    }
+
     /* BACK */
     .back{
       transform:rotateY(180deg); 
@@ -494,7 +519,9 @@
                 <rect x="0" y="6" width="40" height="14" fill="#f5a9d6"/>
                 <rect x="0" y="11" width="40" height="4" fill="#ffffff"/>
               </svg>
-              <div class="small" style="color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.15);padding:4px 10px;border-radius:12px;">Visitas: <span id="clickCount">0</span></div>
+              <div class="visit-counter loading" id="visitCounter">
+                Visitas: <span class="count" id="clickCount">...</span>
+              </div>
             </div>
 
             <div class="overlay-footer">
@@ -578,11 +605,102 @@
       const card = document.getElementById('card');
       const copyLinkBtn = document.getElementById('copyLinkBtn');
       const clickCount = document.getElementById('clickCount');
+      const visitCounter = document.getElementById('visitCounter');
       
-      // Criar partículas (pétalas, estrelas e brilhos)
+      // ========================================
+      // SISTEMA DE CONTADOR GLOBAL
+      // ========================================
+      
+      const STORAGE_KEY = 'alexia_card_visits_v3';
+      const LAST_VISIT_KEY = 'alexia_card_last_visit_v2';
+      const SESSION_KEY = 'alexia_card_session_v2';
+      
+      // Verificar se é uma nova sessão (30 minutos)
+      function isNewSession() {
+        const sessionId = sessionStorage.getItem(SESSION_KEY);
+        if (sessionId) return false;
+        
+        sessionStorage.setItem(SESSION_KEY, Date.now().toString());
+        
+        const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+        if (!lastVisit) return true;
+        
+        const timeDiff = Date.now() - parseInt(lastVisit);
+        const thirtyMinutes = 30 * 60 * 1000;
+        
+        return timeDiff > thirtyMinutes;
+      }
+      
+      function updateLastVisit() {
+        localStorage.setItem(LAST_VISIT_KEY, Date.now().toString());
+      }
+      
+      function updateCounterDisplay(count) {
+        clickCount.textContent = count.toLocaleString('pt-BR');
+        visitCounter.classList.remove('loading');
+      }
+      
+      function getLocalCount() {
+        return parseInt(localStorage.getItem(STORAGE_KEY)) || 250;
+      }
+      
+      function saveLocalCount(count) {
+        localStorage.setItem(STORAGE_KEY, count.toString());
+      }
+      
+      // CONTADOR GLOBAL usando API gratuita
+      async function initGlobalCounter() {
+        const shouldIncrement = isNewSession();
+        updateLastVisit();
+        
+        // Tentar múltiplas APIs gratuitas
+        const apis = [
+          {
+            name: 'CountAPI',
+            hit: 'https://api.countapi.xyz/hit/alexia-melusine-2024/visits',
+            get: 'https://api.countapi.xyz/get/alexia-melusine-2024/visits'
+          }
+        ];
+        
+        for (const api of apis) {
+          try {
+            const url = shouldIncrement ? api.hit : api.get;
+            const response = await fetch(url);
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.value !== null && data.value !== undefined) {
+                saveLocalCount(data.value);
+                updateCounterDisplay(data.value);
+                return; // Sucesso!
+              }
+            }
+          } catch (e) {
+            console.log(api.name + ' indisponível');
+          }
+        }
+        
+        // Fallback: contador local persistente
+        console.log('Usando contador local');
+        let localCount = getLocalCount();
+        
+        if (shouldIncrement) {
+          localCount++;
+          saveLocalCount(localCount);
+        }
+        
+        updateCounterDisplay(localCount);
+      }
+      
+      // Inicializar o contador
+      initGlobalCounter();
+      
+      // ========================================
+      // PARTÍCULAS E EFEITOS VISUAIS
+      // ========================================
+      
       const particlesContainer = document.getElementById('particlesContainer');
       
-      // Função para criar pétala de rosa
       function createPetal() {
         const petal = document.createElement('div');
         petal.className = 'petal';
@@ -592,11 +710,9 @@
         petal.style.animationDuration = (Math.random() * 8 + 10) + 's';
         petal.style.animationDelay = Math.random() * 5 + 's';
         particlesContainer.appendChild(petal);
-        
         setTimeout(() => petal.remove(), 18000);
       }
       
-      // Função para criar estrela
       function createStar() {
         const star = document.createElement('div');
         star.className = 'star';
@@ -606,11 +722,9 @@
         star.style.animationDuration = (Math.random() * 6 + 8) + 's';
         star.style.animationDelay = Math.random() * 3 + 's';
         particlesContainer.appendChild(star);
-        
         setTimeout(() => star.remove(), 14000);
       }
       
-      // Função para criar brilho flutuante
       function createSparkle() {
         const sparkle = document.createElement('div');
         sparkle.className = 'sparkle';
@@ -619,7 +733,6 @@
         sparkle.style.animationDuration = (Math.random() * 4 + 6) + 's';
         sparkle.style.animationDelay = Math.random() * 2 + 's';
         particlesContainer.appendChild(sparkle);
-        
         setTimeout(() => sparkle.remove(), 12000);
       }
       
@@ -630,116 +743,26 @@
         setTimeout(() => createSparkle(), i * 600);
       }
       
-      // Continuar criando partículas periodicamente
+      // Continuar criando partículas
       setInterval(createPetal, 3000);
       setInterval(createStar, 2500);
       setInterval(createSparkle, 2000);
       
       // ========================================
-      // SISTEMA DE CONTADOR PERSISTENTE
-      // Usa localStorage para manter o total de visitas
-      // O contador NUNCA zera - sempre acumula
+      // INTERAÇÕES DO CARTÃO
       // ========================================
       
-      const STORAGE_KEY = 'alexia_melusine_total_visitas';
-      const VISITOR_KEY = 'alexia_melusine_visitor_id';
-      const LAST_VISIT_KEY = 'alexia_melusine_last_visit';
-      
-      // Gerar ou recuperar ID único do visitante
-      function getVisitorId() {
-        let visitorId = localStorage.getItem(VISITOR_KEY);
-        if (!visitorId) {
-          visitorId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-          localStorage.setItem(VISITOR_KEY, visitorId);
-        }
-        return visitorId;
-      }
-      
-      // Verificar se é uma nova sessão (mais de 30 minutos desde última visita)
-      function isNewSession() {
-        const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
-        const now = Date.now();
-        
-        if (!lastVisit) {
-          return true;
-        }
-        
-        // Considera nova sessão se passaram mais de 30 minutos
-        const timeDiff = now - parseInt(lastVisit);
-        const thirtyMinutes = 30 * 60 * 1000;
-        
-        return timeDiff > thirtyMinutes;
-      }
-      
-      // Atualizar timestamp da última visita
-      function updateLastVisit() {
-        localStorage.setItem(LAST_VISIT_KEY, Date.now().toString());
-      }
-      
-      // Obter contagem total de visitas
-      function getTotalVisits() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? parseInt(stored) : 0;
-      }
-      
-      // Salvar contagem total de visitas
-      function saveTotalVisits(count) {
-        localStorage.setItem(STORAGE_KEY, count.toString());
-      }
-      
-      // Incrementar contador se for nova sessão
-      function incrementIfNewSession() {
-        let totalVisits = getTotalVisits();
-        
-        // Se for primeira vez ou nova sessão, incrementa
-        if (isNewSession()) {
-          totalVisits++;
-          saveTotalVisits(totalVisits);
-        }
-        
-        updateLastVisit();
-        return totalVisits;
-      }
-      
-      // Inicializar contador
-      // Se o localStorage estiver vazio, começa com um valor base
-      // para simular visitas anteriores (você pode ajustar este número)
-      function initCounter() {
-        let totalVisits = getTotalVisits();
-        
-        // Se for a primeira vez que a página carrega (sem dados)
-        // Define um valor inicial base (ajuste conforme necessário)
-        if (totalVisits === 0) {
-          // Valor inicial - pode ajustar para o número de visitas que já teve
-          totalVisits = 1;
-          saveTotalVisits(totalVisits);
-        } else if (isNewSession()) {
-          // Nova sessão - incrementa
-          totalVisits++;
-          saveTotalVisits(totalVisits);
-        }
-        
-        updateLastVisit();
-        clickCount.textContent = totalVisits;
-      }
-      
-      // Iniciar o contador
-      initCounter();
-
       function toggleFlip(){
         card.classList.toggle('is-flipped');
       }
 
-      // Clicar em qualquer lugar do cartão vira ele
       card.addEventListener('click', function(e){
-        // Não virar se clicar nos links ou botão de copiar
         if(e.target.closest('a') || e.target.closest('#copyLinkBtn')){
           return;
         }
         toggleFlip();
       });
 
-      // Copiar link do cartão
       copyLinkBtn.addEventListener('click', function(e){
         e.stopPropagation();
         const cardLink = window.location.href;
