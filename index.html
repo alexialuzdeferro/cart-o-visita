@@ -410,6 +410,119 @@
             particle.style.animationDelay = Math.random() * 2 + 's';
             document.getElementById('particles').appendChild(particle);
             setTimeout(() => particle.remove(), 12000);
+
+
+            <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contador Mínimo – Alexia</title>
+
+    <style>
+        /*
+         * Estilos gerais para a página (simulando o fundo)
+         */
+        body {
+            background: #0b0b0b;
+            color: #f2f2f2;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /*
+         * Contêiner fixo no canto da tela
+         */
+        .card-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 100px; /* **Tamanho Mínimo para caber o texto** */
+            opacity: 0.2; /* **Muito Transparente** */
+            transition: opacity 0.5s ease-in-out, width 0.5s ease-in-out;
+            cursor: pointer;
+        }
+
+        /*
+         * Efeito ao passar o mouse para facilitar a leitura/interação
+         */
+        .card-container:hover {
+            opacity: 1; /* Torna totalmente visível */
+            width: 120px; /* Aumenta um pouco ao passar o mouse */
+        }
+
+        .card {
+            /* Fundo branco muito, muito transparente */
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 4px 8px; /* Padding bem reduzido */
+            border-radius: 4px;
+            text-align: center;
+            /* Borda branca super sutil */
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        .contador {
+            margin: 0; /* Remove margem desnecessária */
+            font-size: 10px; /* Fonte bem pequena */
+            font-weight: bold;
+            color: #ffffff; /* **Cor Branca** */
+            /* O texto "Visitas:" agora é todo branco/transparente */
+        }
+
+        .contador span {
+            /* O contador em si pode ter uma leve cor de destaque, mantendo a sobriedade */
+            color: #ffffff; 
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Página Principal</h1>
+    
+    <div class="card-container">
+        <div class="card">
+            <div class="contador">
+                Visitas: <span id="contador">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // CONFIGURAÇÃO SUPABASE — JÁ AJUSTADA COM SEUS DADOS
+        const SUPABASE_URL = "https://qvbjwzszdijhydgcqvyu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_v3VNtkPr6WBgbZnwVTxCFA_e7Mw5PAN";
+
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function registrarVisita() {
+            if (document.visibilityState === 'visible') {
+                await client.from("page_visits").insert([{ route: "business-card" }]);
+            }
+        }
+
+        async function carregarContador() {
+            const { count, error } = await client
+                .from("page_visits")
+                .select("*", { count: "exact" });
+
+            if (!error) {
+                document.getElementById("contador").innerText = count;
+            }
+        }
+
+        async function iniciar() {
+            await registrarVisita();
+            await carregarContador();
+        }
+
+        iniciar();
+    </script>
+
+</body>
+</html>
         }
 
         setInterval(createParticle, 800);
