@@ -42,31 +42,6 @@
             z-index: 0;
         }
 
-        /* Contador de visitas */
-        .visit-counter {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-            z-index: 100;
-            opacity: 0.4;
-            transition: opacity 0.3s ease;
-        }
-
-        .visit-counter:hover {
-            opacity: 1;
-        }
-
-        .visit-counter span {
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-        }
-
         .particle {
             position: fixed;
             pointer-events: none;
@@ -173,6 +148,23 @@
             color: rgba(255,255,255,0.9);
             font-size: 14px;
             margin-bottom: 8px;
+        }
+
+        /* Contador de visitas - discreto abaixo do nome */
+        .visit-counter {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .visit-counter:hover {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .visit-counter span {
+            font-weight: 600;
         }
 
         .touch-overlay {
@@ -364,11 +356,6 @@
 <body>
     <div id="particles"></div>
 
-    <!-- Contador de visitas -->
-    <div class="visit-counter">
-        👁️ Visitas: <span id="contador">0</span>
-    </div>
-
     <div class="flip-card" id="flipCard" onclick="flipCard()">
         <div class="flip-card-inner">
             <div class="flip-card-front">
@@ -377,6 +364,10 @@
                 <div class="front-overlay">
                     <h1 class="name-overlay">Alexia Melusine 🌹</h1>
                     <p class="title-overlay">Criadora de conteúdo</p>
+                    <!-- Contador discreto abaixo do nome -->
+                    <div class="visit-counter">
+                        👁️ <span id="contador">0</span> visitas
+                    </div>
                     <p class="touch-overlay">Toque para virar</p>
                 </div>
             </div>
@@ -422,7 +413,7 @@
     <script>
         // Configuração Supabase
         const SUPABASE_URL = "https://qvbjwzszdijhydgcqvyu.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Ymp3enN6ZGlqaHlkZ2Nxdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwMTYwOTYsImV4cCI6MjA0MzU5NDA5Nn0.v3VNtkPr6WBgbZnwVTxCFA_e7Mw5PAN";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Ymp3enN6ZGlqaHlkZ2Nxdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzMjA3NDQsImV4cCI6MjA4MDg5Njc0NH0.w__h1N2owBQC5HDedmCjRX4IPcXODs_Kc5RyfYeHk_g";
 
         let client;
 
