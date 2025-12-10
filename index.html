@@ -118,6 +118,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .photo-front {
@@ -202,6 +203,12 @@
         .flag-stripe.white { background: #ffffff !important; }
 
         /* Back side styles */
+        .back-header-clickable {
+            flex-shrink: 0;
+            cursor: pointer;
+            text-align: center;
+        }
+
         .photo-back {
             width: 70px;
             height: 70px;
@@ -210,7 +217,6 @@
             margin: 0 auto 10px;
             border: 2px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            flex-shrink: 0;
         }
 
         .back-header {
@@ -241,9 +247,13 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            overflow-y: auto;
+            overflow-y: scroll;
+            overflow-x: hidden;
             padding-right: 4px;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            min-height: 0;
         }
 
         .about {
@@ -441,9 +451,9 @@
 <body>
     <div id="particles"></div>
 
-    <div class="flip-card" id="flipCard" onclick="flipCard()">
+    <div class="flip-card" id="flipCard">
         <div class="flip-card-inner">
-            <div class="flip-card-front">
+            <div class="flip-card-front" onclick="flipCard()">
                 <div class="flag-overlay">
                     <div class="flag-stripe blue"></div>
                     <div class="flag-stripe pink"></div>
@@ -463,13 +473,15 @@
                 </div>
             </div>
             <div class="flip-card-back">
-                <img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/main/ale.jpeg" alt="Alexia Melusine" class="photo-back">
-                <div class="back-header">
-                    <h1 class="back-name">Alexia Melusine</h1>
-                    <p class="back-title">Criadora de conteúdo</p>
-                    <p class="back-flip-text">Toque para virar</p>
+                <div class="back-header-clickable" onclick="flipCard()">
+                    <img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/main/ale.jpeg" alt="Alexia Melusine" class="photo-back">
+                    <div class="back-header">
+                        <h1 class="back-name">Alexia Melusine</h1>
+                        <p class="back-title">Criadora de conteúdo</p>
+                        <p class="back-flip-text">Toque para virar</p>
+                    </div>
                 </div>
-                <div class="back-content">
+                <div class="back-content" id="backContent">
                     <div class="about">
                         <h3>✨ Sobre mim</h3>
                         <p>Sou Alexia Melusine — criadora de conteúdo, pesquisadora independente e artista dedicada à comunicação espiritual e à representatividade. Meu foco é o estudo e produção de conteúdo sobre Pombagiras, integrando devoção, pesquisa e expressão estética. Libriana e freelancer, combino sensibilidade e criatividade em narrativas visuais e conceitos místicos.</p>
@@ -560,6 +572,24 @@
                 setTimeout(() => btn.textContent = '📋 Copiar link do cartão', 2000);
             });
         }
+
+        // Impede que o scroll dentro do conteúdo dispare o flip
+        document.addEventListener('DOMContentLoaded', function() {
+            const backContent = document.getElementById('backContent');
+            if (backContent) {
+                backContent.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                }, { passive: true });
+                
+                backContent.addEventListener('touchmove', function(e) {
+                    e.stopPropagation();
+                }, { passive: true });
+                
+                backContent.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
 
         // Partículas
         function createParticle() {
