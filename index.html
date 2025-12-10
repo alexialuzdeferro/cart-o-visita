@@ -608,14 +608,24 @@
       const visitCounter = document.getElementById('visitCounter');
       
       // ========================================
-      // SISTEMA DE CONTADOR GLOBAL
+      // SISTEMA DE CONTADOR GLOBAL (CountAPI)
+      // - opção escolhida: GitHub Visitor Counter (via CountAPI)
+      // - namespace/key definidos com base no seu repo GitHub Pages:
+      //   site: alexialuzdeferro.github.io
+      //   repo: Business-Card
       // ========================================
       
+      // Configuração do namespace/key (CountAPI)
+      const COUNT_NAMESPACE = encodeURIComponent('alexialuzdeferro.github.io');
+      const COUNT_KEY = encodeURIComponent('Business-Card');
+      const COUNTAPI_HIT = `https://api.countapi.xyz/hit/${COUNT_NAMESPACE}/${COUNT_KEY}`;
+      const COUNTAPI_GET = `https://api.countapi.xyz/get/${COUNT_NAMESPACE}/${COUNT_KEY}`;
+
       const STORAGE_KEY = 'alexia_card_visits_v3';
       const LAST_VISIT_KEY = 'alexia_card_last_visit_v2';
       const SESSION_KEY = 'alexia_card_session_v2';
-      
-      // Verificar se é uma nova sessão (30 minutos)
+
+      // Considera nova sessão se não houver sessionStorage setado
       function isNewSession() {
         const sessionId = sessionStorage.getItem(SESSION_KEY);
         if (sessionId) return false;
@@ -625,76 +635,62 @@
         const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
         if (!lastVisit) return true;
         
-        const timeDiff = Date.now() - parseInt(lastVisit);
+        const timeDiff = Date.now() - parseInt(lastVisit, 10);
         const thirtyMinutes = 30 * 60 * 1000;
         
         return timeDiff > thirtyMinutes;
       }
-      
+
       function updateLastVisit() {
         localStorage.setItem(LAST_VISIT_KEY, Date.now().toString());
       }
-      
+
       function updateCounterDisplay(count) {
-        clickCount.textContent = count.toLocaleString('pt-BR');
+        clickCount.textContent = Number(count).toLocaleString('pt-BR');
         visitCounter.classList.remove('loading');
       }
-      
+
       function getLocalCount() {
-        return parseInt(localStorage.getItem(STORAGE_KEY)) || 250;
+        return parseInt(localStorage.getItem(STORAGE_KEY), 10) || 250;
       }
-      
+
       function saveLocalCount(count) {
         localStorage.setItem(STORAGE_KEY, count.toString());
       }
-      
-      // CONTADOR GLOBAL usando API gratuita
+
+      // Função central que usa CountAPI (gratuita, sem chave)
       async function initGlobalCounter() {
         const shouldIncrement = isNewSession();
         updateLastVisit();
-        
-        // Tentar múltiplas APIs gratuitas
-        const apis = [
-          {
-            name: 'CountAPI',
-            hit: 'https://api.countapi.xyz/hit/alexia-melusine-2024/visits',
-            get: 'https://api.countapi.xyz/get/alexia-melusine-2024/visits'
+
+        try {
+          const url = shouldIncrement ? COUNTAPI_HIT : COUNTAPI_GET;
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) throw new Error('CountAPI retornou erro: ' + res.status);
+          const json = await res.json();
+          // CountAPI retorna { value: N }
+          if (json && (json.value !== undefined)) {
+            const value = Number(json.value);
+            saveLocalCount(value);
+            updateCounterDisplay(value);
+            return;
           }
-        ];
-        
-        for (const api of apis) {
-          try {
-            const url = shouldIncrement ? api.hit : api.get;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-              const data = await response.json();
-              if (data.value !== null && data.value !== undefined) {
-                saveLocalCount(data.value);
-                updateCounterDisplay(data.value);
-                return; // Sucesso!
-              }
-            }
-          } catch (e) {
-            console.log(api.name + ' indisponível');
+          throw new Error('Resposta CountAPI inesperada');
+        } catch (err) {
+          console.warn('CountAPI indisponível ou erro:', err);
+          // Fallback local (mantém contador persistente no navegador)
+          let localCount = getLocalCount();
+          if (shouldIncrement) {
+            localCount++;
+            saveLocalCount(localCount);
           }
+          updateCounterDisplay(localCount);
         }
-        
-        // Fallback: contador local persistente
-        console.log('Usando contador local');
-        let localCount = getLocalCount();
-        
-        if (shouldIncrement) {
-          localCount++;
-          saveLocalCount(localCount);
-        }
-        
-        updateCounterDisplay(localCount);
       }
-      
+
       // Inicializar o contador
       initGlobalCounter();
-      
+
       // ========================================
       // PARTÍCULAS E EFEITOS VISUAIS
       // ========================================
