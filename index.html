@@ -385,12 +385,28 @@
       const card = document.getElementById('card');
       const copyLinkBtn = document.getElementById('copyLinkBtn');
       const clickCount = document.getElementById('clickCount');
-      let clicks = 0;
+      
+      // Usar CountAPI para contador global de visitas
+      // Namespace único para seu cartão (alexia-melusine-card)
+      const namespace = 'alexia-melusine-card';
+      const key = 'visitas';
+      
+      // Incrementar e buscar o contador global
+      fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
+        .then(response => response.json())
+        .then(data => {
+          clickCount.textContent = data.value;
+        })
+        .catch(error => {
+          // Se falhar, usa localStorage como backup
+          let clicks = parseInt(localStorage.getItem('alexiaCardVisits')) || 0;
+          clicks++;
+          localStorage.setItem('alexiaCardVisits', clicks);
+          clickCount.textContent = clicks;
+        });
 
       function toggleFlip(){
         card.classList.toggle('is-flipped');
-        clicks++;
-        clickCount.textContent = clicks;
       }
 
       // Clicar em qualquer lugar do cartão vira ele
