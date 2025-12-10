@@ -2,9 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Cartão de Visitas — Alexia Melusine</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
       --bg:#0f0b12;
@@ -37,7 +39,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Partículas */
+    /* Container para partículas */
     .particles-container {
       position: fixed;
       top: 0;
@@ -49,6 +51,7 @@
       z-index: 0;
     }
 
+    /* Pétalas de rosa caindo */
     .petal {
       position: absolute;
       top: -50px;
@@ -58,12 +61,23 @@
     }
 
     @keyframes fallPetal {
-      0% { transform: translateY(0) rotate(0deg) translateX(0); opacity:0;}
-      10%{ opacity:0.6;}
-      90%{ opacity:0.4;}
-      100%{ transform: translateY(100vh) rotate(360deg) translateX(50px); opacity:0;}
+      0% {
+        transform: translateY(0) rotate(0deg) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg) translateX(50px);
+        opacity: 0;
+      }
     }
 
+    /* Estrelas brilhantes */
     .star {
       position: absolute;
       top: -20px;
@@ -77,12 +91,24 @@
     }
 
     @keyframes fallStar {
-      0% { transform: translateY(0) scale(0); opacity:0;}
-      10%{ opacity:0.8; transform: translateY(10vh) scale(1);}
-      90%{ opacity:0.4;}
-      100%{ transform: translateY(100vh) scale(0.5); opacity:0;}
+      0% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+        transform: translateY(10vh) scale(1);
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
     }
 
+    /* Brilhos sutis flutuantes */
     .sparkle {
       position: absolute;
       width: 2px;
@@ -94,12 +120,25 @@
     }
 
     @keyframes sparkleFloat {
-      0%,100% { transform: translateY(0) translateX(0) scale(1); opacity:0.3;}
-      25%{ transform: translateY(-30px) translateX(20px) scale(1.5); opacity:0.7;}
-      50%{ transform: translateY(-10px) translateX(-10px) scale(1); opacity:0.4;}
-      75%{ transform: translateY(-40px) translateX(15px) scale(1.3); opacity:0.6;}
+      0%, 100% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0.3;
+      }
+      25% {
+        transform: translateY(-30px) translateX(20px) scale(1.5);
+        opacity: 0.7;
+      }
+      50% {
+        transform: translateY(-10px) translateX(-10px) scale(1);
+        opacity: 0.4;
+      }
+      75% {
+        transform: translateY(-40px) translateX(15px) scale(1.3);
+        opacity: 0.6;
+      }
     }
 
+    /* Aura gradiente suave atrás do card */
     .aura {
       position: fixed;
       width: 600px;
@@ -111,15 +150,31 @@
       z-index: 0;
     }
 
-    .aura-1 { top: -200px; left:-200px;}
-    .aura-2 { bottom:-200px; right:-200px; background: radial-gradient(circle, rgba(100,30,80,0.12) 0%, rgba(60,20,80,0.06) 40%, transparent 70%);}
-
-    @keyframes auraFloat {
-      0%,100%{ transform:translate(0,0) scale(1); opacity:0.6;}
-      50%{ transform:translate(30px,20px) scale(1.1); opacity:0.8;}
+    .aura-1 {
+      top: -200px;
+      left: -200px;
+      animation-delay: 0s;
     }
 
-    .card-wrap{width:360px; perspective:1400px; position:relative; z-index:10;}
+    .aura-2 {
+      bottom: -200px;
+      right: -200px;
+      animation-delay: -5s;
+      background: radial-gradient(circle, rgba(100,30,80,0.12) 0%, rgba(60,20,80,0.06) 40%, transparent 70%);
+    }
+
+    @keyframes auraFloat {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translate(30px, 20px) scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .card-wrap{width:360px; perspective:1400px; position:relative; z-index:10}
     .card{
       width:100%;
       height:620px;
@@ -129,7 +184,7 @@
       border-radius:20px;
       cursor:pointer;
     }
-    .card.is-flipped{transform:rotateY(180deg);}
+    .card.is-flipped{transform:rotateY(180deg)}
 
     .side{
       position:absolute; 
@@ -141,6 +196,7 @@
       overflow:hidden;
     }
 
+    /* FRONT - Foto limpa */
     .front{
       display:flex;
       flex-direction:column;
@@ -218,6 +274,34 @@
 
     .small{font-size:12px;color:var(--muted)}
 
+    .visit-badge {
+      color:rgba(255,255,255,0.9);
+      background:rgba(0,0,0,0.4);
+      padding:6px 12px;
+      border-radius:12px;
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-weight: 500;
+    }
+
+    .visit-badge svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0.9;
+    }
+
+    .visit-badge .count {
+      font-weight: 700;
+      color: #fff;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* BACK */
     .back{
       transform:rotateY(180deg); 
       background: linear-gradient(180deg, rgba(27,18,32,0.98), rgba(16,11,18,0.99));
@@ -367,23 +451,51 @@
       background: linear-gradient(135deg, #28a745, #1e7e34);
     }
 
+    /* Animação do contador */
+    @keyframes countPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .count-animate {
+      animation: countPulse 0.5s ease;
+    }
+
+    /* Loading spinner */
+    .loading-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* responsive */
     @media (max-width:420px){ 
       .card-wrap{width:320px} 
       .card{height:580px}
       .name{font-size:20px}
       .bio{font-size:11px}
     }
-
   </style>
 </head>
 <body>
+  <!-- Auras de fundo -->
   <div class="aura aura-1"></div>
   <div class="aura aura-2"></div>
+  
+  <!-- Container de partículas -->
   <div class="particles-container" id="particlesContainer"></div>
 
   <div class="card-wrap" aria-label="Cartão virtual de Alexia Melusine">
     <div class="card" id="card">
 
+      <!-- FRENTE - Foto limpa sem texto sobreposto -->
       <div class="side front" id="front">
         <div class="photo-container">
           <img src="https://raw.githubusercontent.com/alexialuzdeferro/cart-o-visita/main/ale.jpeg" alt="Foto de Alexia Melusine"/>
@@ -394,10 +506,15 @@
                 <rect x="0" y="6" width="40" height="14" fill="#f5a9d6"/>
                 <rect x="0" y="11" width="40" height="4" fill="#ffffff"/>
               </svg>
-              <div class="small" style="color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.15);padding:4px 10px;border-radius:12px;">
-                Visitas: <span id="contador">0</span>
+              <div class="visit-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span class="count" id="visitCount"><div class="loading-spinner"></div></span>
               </div>
             </div>
+
             <div class="overlay-footer">
               <div class="name">Alexia Melusine 🌹</div>
               <div class="tagline">Criadora de conteúdo</div>
@@ -415,6 +532,7 @@
         </div>
       </div>
 
+      <!-- VERSO - Informações completas -->
       <div class="side back">
         <div class="back-header">
           <img class="back-avatar" src="https://raw.githubusercontent.com/alexialuzdeferro/cart-o-visita/main/ale.jpeg" alt="Alexia"/>
@@ -423,21 +541,48 @@
             <div class="back-tagline">Criadora de conteúdo</div>
           </div>
         </div>
+
         <div class="content">
           <div class="section-title">✨ Sobre mim</div>
           <div class="bio">
-            Sou Alexia Melusine — criadora de conteúdo, pesquisadora independente e artista dedicada à comunicação espiritual e à representatividade...
+            Sou Alexia Melusine — criadora de conteúdo, pesquisadora independente e artista dedicada à comunicação espiritual e à representatividade. Meu principal foco é o estudo e a produção de conteúdo sobre Pombagiras, tema que integra minha devoção, minha pesquisa e minha expressão estética.
+            <br><br>
+            Atuo também abordando temas relacionados a pessoas não binárias, trans e transgender, promovendo visibilidade, reflexão e fortalecimento dentro do movimento LGBTQIA+.
+            <br><br>
+            Libriana e profissional freelancer, combino sensibilidade, análise e criatividade na construção de narrativas visuais, conceitos místicos e conteúdos cinematográficos. No meu caminho espiritual e artístico, assino também como Alexia Rosa de Fogo e Alexia Luz de Ferro, nomes que representam minha identidade, força e trajetória devocional.
           </div>
+
+          <div class="section-title">🎬 O que faço</div>
+          <div class="badges">
+            <div class="badge">📱 Criação de conteúdo</div>
+            <div class="badge">🌐 Sites e Blogs</div>
+            <div class="badge">🎨 Prompts</div>
+            <div class="badge">🤖 Pesquisas de IA</div>
+          </div>
+
           <div class="section-title">🔗 Portfólio</div>
           <div class="links">
-            <a class="link" href="https://www.tiktok.com/@almasdepombagira?lang=pt-BR" target="_blank">🎵 TikTok</a>
-            <a class="link" href="https://www.instagram.com/almasdepombagira/" target="_blank">📸 Instagram</a>
-            <a class="link" href="https://www.youtube.com/@almasdepombagira" target="_blank">▶️ YouTube</a>
-            <a class="link" href="https://www.kwai.com/@AlexiaRosadeFogo" target="_blank">🎬 Kwai</a>
+            <a class="link" href="https://www.tiktok.com/@almasdepombagira?lang=pt-BR" target="_blank" rel="noopener">
+              <span class="link-icon">🎵</span> TikTok
+            </a>
+            <a class="link" href="https://www.instagram.com/almasdepombagira/?igsh=Y3VocnA2aDQxYjlw" target="_blank" rel="noopener">
+              <span class="link-icon">📸</span> Instagram
+            </a>
+            <a class="link" href="https://www.youtube.com/@almasdepombagira" target="_blank" rel="noopener">
+              <span class="link-icon">▶️</span> YouTube
+            </a>
+            <a class="link" href="https://www.kwai.com/@AlexiaRosadeFogo" target="_blank" rel="noopener">
+              <span class="link-icon">🎬</span> Kwai
+            </a>
           </div>
         </div>
+
         <div class="footer">
           <button class="copy-link-btn" id="copyLinkBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
             Copiar link do cartão
           </button>
         </div>
@@ -446,55 +591,176 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (function(){
       const card = document.getElementById('card');
       const copyLinkBtn = document.getElementById('copyLinkBtn');
-      const contador = document.getElementById('contador');
-
-      // Partículas
-      const particlesContainer = document.getElementById('particlesContainer');
-      function createPetal(){ const p=document.createElement('div');p.className='petal';p.innerHTML='🌸';p.style.left=Math.random()*100+'vw';p.style.fontSize=(Math.random()*12+8)+'px';p.style.animationDuration=(Math.random()*8+10)+'s';p.style.animationDelay=Math.random()*5+'s';particlesContainer.appendChild(p);setTimeout(()=>p.remove(),18000);}
-      function createStar(){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'vw';s.style.animationDuration=(Math.random()*10+8)+'s';s.style.animationDelay=Math.random()*5+'s';particlesContainer.appendChild(s);setTimeout(()=>s.remove(),18000);}
-      function createSparkle(){const sp=document.createElement('div');sp.className='sparkle';sp.style.left=Math.random()*100+'vw';sp.style.animationDuration=(Math.random()*10+5)+'s';sp.style.animationDelay=Math.random()*5+'s';particlesContainer.appendChild(sp);setTimeout(()=>sp.remove(),18000);}
-      setInterval(()=>{createPetal();createStar();createSparkle()},500);
-
-      // Flip card
-      card.addEventListener('click',()=>card.classList.toggle('is-flipped'));
-
-      // Copy link
-      copyLinkBtn.addEventListener('click',()=>{
-        navigator.clipboard.writeText(window.location.href);
-        copyLinkBtn.textContent='Copiado!';
-        copyLinkBtn.classList.add('copied');
-        setTimeout(()=>{
-          copyLinkBtn.textContent='Copiar link do cartão';
-          copyLinkBtn.classList.remove('copied');
-        },2000);
-      });
-
-      // Supabase
-      const supabaseUrl = 'COLOQUE_SUA_URL_AQUI';
-      const supabaseKey = 'COLOQUE_SUA_KEY_AQUI';
-      const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
-
-      async function incrementarVisita(){
-        const { data } = await supabase
-          .from('contador')
-          .select('*')
-          .eq('id',1)
-          .single();
-        if(data){
-          await supabase.from('contador').update({visitas:data.visitas+1}).eq('id',1);
-          contador.textContent = data.visitas + 1;
-        } else {
-          await supabase.from('contador').insert({id:1, visitas:1});
-          contador.textContent = 1;
+      const visitCountEl = document.getElementById('visitCount');
+      
+      // ========== CONFIGURAÇÃO SUPABASE ==========
+      const SUPABASE_URL = 'https://qvbjwzszdijhydgcqvyu.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Ymp3enN6ZGlqaHlkZ2Nxdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2OTg2NDUsImV4cCI6MjA2NDI3NDY0NX0.sb_publishable_v3VNtkPr6WBgbZnwVTxCFA_e7Mw5PAN';
+      
+      // Inicializar cliente Supabase
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      // ========== CONTADOR DE VISITAS COM SUPABASE ==========
+      const SESSION_KEY = 'alexia_session_counted';
+      const ROUTE = '/cartao-alexia';
+      
+      // Função para atualizar o contador na tela
+      function updateCounterDisplay(count) {
+        visitCountEl.textContent = count.toLocaleString('pt-BR');
+        visitCountEl.classList.add('count-animate');
+        setTimeout(() => visitCountEl.classList.remove('count-animate'), 500);
+      }
+      
+      // Função para usar localStorage como fallback
+      function useLocalStorage() {
+        const STORAGE_KEY = 'alexia_card_visits';
+        const sessionCounted = sessionStorage.getItem(SESSION_KEY);
+        let count = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+        
+        if (!sessionCounted) {
+          count++;
+          localStorage.setItem(STORAGE_KEY, count.toString());
+          sessionStorage.setItem(SESSION_KEY, 'true');
+        }
+        
+        updateCounterDisplay(count);
+      }
+      
+      // Função principal para gerenciar o contador
+      async function initVisitCounter() {
+        const sessionCounted = sessionStorage.getItem(SESSION_KEY);
+        
+        try {
+          // Se ainda não contou nessa sessão, inserir nova visita
+          if (!sessionCounted) {
+            const { error: insertError } = await supabase
+              .from('page_visits')
+              .insert([{ route: ROUTE }]);
+            
+            if (insertError) {
+              console.error('Erro ao inserir visita:', insertError);
+              throw insertError;
+            }
+            
+            sessionStorage.setItem(SESSION_KEY, 'true');
+          }
+          
+          // Contar total de visitas para essa rota
+          const { count, error: countError } = await supabase
+            .from('page_visits')
+            .select('*', { count: 'exact', head: true })
+            .eq('route', ROUTE);
+          
+          if (countError) {
+            console.error('Erro ao contar visitas:', countError);
+            throw countError;
+          }
+          
+          updateCounterDisplay(count || 0);
+          
+        } catch (error) {
+          console.error('Erro Supabase:', error);
+          console.log('Usando localStorage como fallback...');
+          useLocalStorage();
         }
       }
+      
+      // Inicializar contador
+      initVisitCounter();
+      
+      // ========== SISTEMA DE PARTÍCULAS ==========
+      const particlesContainer = document.getElementById('particlesContainer');
+      
+      // Função para criar pétala de rosa
+      function createPetal() {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        petal.innerHTML = '🌸';
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.fontSize = (Math.random() * 12 + 8) + 'px';
+        petal.style.animationDuration = (Math.random() * 8 + 10) + 's';
+        petal.style.animationDelay = Math.random() * 5 + 's';
+        particlesContainer.appendChild(petal);
+        
+        setTimeout(() => petal.remove(), 18000);
+      }
+      
+      // Função para criar estrela
+      function createStar() {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.width = (Math.random() * 3 + 2) + 'px';
+        star.style.height = star.style.width;
+        star.style.animationDuration = (Math.random() * 6 + 8) + 's';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        particlesContainer.appendChild(star);
+        
+        setTimeout(() => star.remove(), 14000);
+      }
+      
+      // Função para criar brilho flutuante
+      function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = Math.random() * 100 + 'vw';
+        sparkle.style.top = Math.random() * 100 + 'vh';
+        sparkle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+        sparkle.style.animationDelay = Math.random() * 2 + 's';
+        particlesContainer.appendChild(sparkle);
+        
+        setTimeout(() => sparkle.remove(), 12000);
+      }
+      
+      // Criar partículas iniciais
+      for(let i = 0; i < 5; i++) {
+        setTimeout(() => createPetal(), i * 1000);
+        setTimeout(() => createStar(), i * 800);
+        setTimeout(() => createSparkle(), i * 600);
+      }
+      
+      // Continuar criando partículas periodicamente
+      setInterval(createPetal, 3000);
+      setInterval(createStar, 2500);
+      setInterval(createSparkle, 2000);
 
-      incrementarVisita();
+      // ========== FUNCIONALIDADE DO CARTÃO ==========
+      
+      function toggleFlip(){
+        card.classList.toggle('is-flipped');
+      }
+
+      // Clicar em qualquer lugar do cartão vira ele
+      card.addEventListener('click', function(e){
+        // Não virar se clicar nos links ou botão de copiar
+        if(e.target.closest('a') || e.target.closest('#copyLinkBtn')){
+          return;
+        }
+        toggleFlip();
+      });
+
+      // Copiar link do cartão
+      copyLinkBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        const cardLink = window.location.href;
+        if(navigator.clipboard){
+          navigator.clipboard.writeText(cardLink).then(()=>{
+            copyLinkBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Link copiado!';
+            copyLinkBtn.classList.add('copied');
+            setTimeout(()=> {
+              copyLinkBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Copiar link do cartão';
+              copyLinkBtn.classList.remove('copied');
+            }, 2000);
+          });
+        } else {
+          prompt('Copie este link:', cardLink);
+        }
+      });
+
     })();
   </script>
 </body>
