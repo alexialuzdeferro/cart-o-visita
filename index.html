@@ -301,11 +301,11 @@
                 <rect x="0" y="6" width="40" height="14" fill="#f5a9d6"/>
                 <rect x="0" y="11" width="40" height="4" fill="#ffffff"/>
               </svg>
-              <div class="small" style="color:rgba(255,255,255,0.7)">🌹</div>
+              <div class="small" style="color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.15);padding:4px 10px;border-radius:12px;">Visitas: <span id="clickCount">0</span></div>
             </div>
 
             <div class="overlay-footer">
-              <div class="name">Alexia Melusine</div>
+              <div class="name">Alexia Melusine 🌹</div>
               <div class="tagline">Criadora de conteúdo</div>
               <div class="flip-hint">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -384,9 +384,13 @@
     (function(){
       const card = document.getElementById('card');
       const copyLinkBtn = document.getElementById('copyLinkBtn');
+      const clickCount = document.getElementById('clickCount');
+      let clicks = 0;
 
       function toggleFlip(){
         card.classList.toggle('is-flipped');
+        clicks++;
+        clickCount.textContent = clicks;
       }
 
       // Clicar em qualquer lugar do cartão vira ele
