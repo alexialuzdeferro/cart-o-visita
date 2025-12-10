@@ -255,8 +255,37 @@
             touch-action: pan-y !important;
             min-height: 0;
             position: relative;
-            pointer-events: auto;
-        }
+	            pointer-events: auto;
+	        }
+
+	        /* Estilização da barra de rolagem para WebKit (Chrome, Safari) */
+	        .back-content::-webkit-scrollbar {
+	            width: 8px; /* Largura da barra de rolagem */
+	            height: 8px;
+	        }
+
+	        .back-content::-webkit-scrollbar-track {
+	            background: rgba(0, 0, 0, 0.3); /* Fundo da trilha */
+	            border-radius: 10px;
+	        }
+
+	        .back-content::-webkit-scrollbar-thumb {
+	            background: #ff69b4; /* Cor do polegar (rosa) */
+	            border-radius: 10px;
+	            border: 2px solid rgba(0, 0, 0, 0.3); /* Borda para dar destaque */
+	        }
+
+	        .back-content::-webkit-scrollbar-thumb:hover {
+	            background: #ff2d90; /* Cor ao passar o mouse */
+	        }
+
+	        /* Força a barra de rolagem a ser sempre visível, conforme solicitado */
+	        /* Isso pode adicionar uma barra cinza em alguns navegadores, mesmo sem conteúdo suficiente, mas garante a visibilidade */
+	        @media (max-width: 600px) {
+	            .back-content {
+	                overflow-y: scroll !important;
+	            }
+	        }
 
         .about {
             background: rgba(0, 0, 0, 0.2);
