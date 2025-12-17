@@ -1,723 +1,242 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartão de Visitas - Alexia Melusine</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartão de Visitas - Alexia Melusine</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6b0f6b 0%, #b30000 25%, #4a0e4e 50%, #8b0000 75%, #1a0a1a 100%);
-            background-size: 300% 300%;
-            animation: gradientShift 12s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-            overflow-x: hidden;
-            position: relative;
-        }
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+body{
+font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+background:linear-gradient(135deg,#6b0f6b,#b30000,#4a0e4e,#8b0000,#1a0a1a);
+background-size:300% 300%;
+animation:gradientShift 12s ease infinite;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:15px;
+overflow-x:hidden;
+}
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
-            pointer-events: none;
-            z-index: 0;
-        }
+@keyframes gradientShift{
+0%,100%{background-position:0% 50%}
+50%{background-position:100% 50%}
+}
 
-        .particle {
-            position: fixed;
-            pointer-events: none;
-            filter: drop-shadow(0 0 6px rgba(255, 20, 147, 0.5));
-            z-index: 0;
-        }
+.flip-card{
+width:320px;
+height:520px;
+perspective:1000px;
+}
 
-        .rose {
-            font-size: 20px;
-            animation: fallRose 10s linear infinite;
-        }
+.flip-card-inner{
+width:100%;
+height:100%;
+transition:transform .7s ease;
+transform-style:preserve-3d;
+}
 
-        .star {
-            font-size: 14px;
-            animation: fallStar 8s linear infinite;
-        }
+.flip-card.flipped .flip-card-inner{
+transform:rotateY(180deg);
+}
 
-        @keyframes fallRose {
-            0% { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.6; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
-        }
+.flip-card-front,.flip-card-back{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
 
-        @keyframes fallStar {
-            0% { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 0.5; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
-        }
+.flip-card-front{background:#1a0a1a}
+.flip-card-back{
+background:linear-gradient(160deg,#4a0e4e,#8b0000,#2a0a2a);
+transform:rotateY(180deg);
+padding:20px;
+display:flex;
+flex-direction:column;
+}
 
-        .flip-card {
-            width: 320px;
-            height: 520px;
-            perspective: 1000px;
-            cursor: pointer;
-            position: relative;
-            z-index: 1;
-        }
+.photo-front{
+width:100%;
+height:100%;
+object-fit:cover;
+}
 
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.7s ease;
-            transform-style: preserve-3d;
-            -webkit-transform-style: preserve-3d;
-        }
+.front-overlay{
+position:absolute;
+bottom:0;
+width:100%;
+padding:25px 15px;
+background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,.5),transparent);
+text-align:center;
+}
 
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
+.name-overlay{color:#fff;font-size:22px;font-weight:bold}
+.title-overlay{color:rgba(255,255,255,.85);font-size:14px}
+.visit-counter{font-size:10px;color:rgba(255,255,255,.4);margin-top:5px}
+.touch-overlay{font-size:11px;color:rgba(255,255,255,.7)}
 
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
+.photo-back{
+width:70px;
+height:70px;
+border-radius:50%;
+object-fit:cover;
+margin:0 auto 10px;
+border:2px solid rgba(255,255,255,.4);
+}
 
-        .flip-card-front {
-            background: #1a0a1a;
-            z-index: 2;
-        }
+.back-header{text-align:center;margin-bottom:10px}
+.back-name{font-size:16px;color:#fff;font-weight:bold}
+.back-title{font-size:11px;color:rgba(255,255,255,.85)}
 
-	        .flip-card-back {
-	            background: linear-gradient(160deg, #4a0e4e 0%, #8b0000 50%, #2a0a2a 100%);
-	            transform: rotateY(180deg);
-	            padding: 20px;
-	            display: flex;
-	            flex-direction: column;
-	            overflow: hidden;
-	            touch-action: none;
-	            position: relative; /* Necessário para posicionar o botão de cópia */
-	        }
+.back-content{
+flex:1;
+overflow-y:auto;
+padding-right:4px;
+}
 
-        .photo-front {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.portfolio-section{
+background:rgba(0,0,0,.25);
+padding:12px;
+border-radius:10px;
+margin-bottom:10px;
+}
 
-        .front-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 25px 15px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
-            text-align: center;
-        }
+.portfolio-section h3{
+text-align:center;
+color:#ff69b4;
+margin-bottom:10px;
+font-size:13px;
+}
 
-        .name-overlay {
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(255, 20, 147, 0.6);
-        }
+.social-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:8px;
+}
 
-        .title-overlay {
-            color: rgba(255,255,255,0.9);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
+.social-btn{
+background:rgba(255,255,255,.1);
+color:#fff;
+text-decoration:none;
+padding:10px;
+border-radius:8px;
+text-align:center;
+font-size:11px;
+}
 
-        .visit-counter {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.15);
-            margin-bottom: 6px;
-            transition: color 0.3s ease;
-            letter-spacing: 0.5px;
-        }
+.highlight-phrase{
+text-align:center;
+color:#ff69b4;
+font-size:12px;
+margin:12px 0;
+font-weight:bold;
+}
 
-        .visit-counter:hover {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .visit-counter span {
-            font-weight: 600;
-        }
-
-        .touch-overlay {
-            color: rgba(255,255,255,0.7);
-            font-size: 11px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-
-
-
-	        .copy-link-indicator {
-	            position: absolute;
-	            top: 10px;
-	            left: 10px;
-	            width: 30px;
-	            height: 30px;
-	            border: 2px solid rgba(255, 255, 255, 0.1); /* Borda muito transparente */
-	            border-radius: 50%;
-	            border-right-color: transparent;
-	            border-bottom-color: transparent;
-	            transform: rotate(45deg);
-	            opacity: 0.5; /* Transparência */
-	            transition: opacity 0.3s ease;
-	            z-index: 10;
-	        }
-	
-	        .copy-link-indicator::after {
-	            content: '';
-	            position: absolute;
-	            width: 8px;
-	            height: 2px;
-	            background: rgba(255, 255, 255, 0.1); /* Cor da ponta da seta */
-	            top: 2px;
-	            left: 20px;
-	            transform: rotate(45deg);
-	        }
-	
-	        .copy-link-indicator:hover {
-	            opacity: 0.8;
-	        }
-	
-	        .copy-link-back-indicator {
-	            position: absolute;
-	            top: 10px;
-	            left: 10px;
-	            width: 30px;
-	            height: 30px;
-	            cursor: pointer;
-	            z-index: 10;
-	            opacity: 0.5;
-	            transition: opacity 0.3s ease;
-	        }
-	
-	        .copy-link-back-indicator:hover {
-	            opacity: 0.8;
-	        }
-	
-	        .copy-link-back-indicator::before {
-	            content: '📋'; /* Símbolo universal de copiar */
-	            font-size: 20px;
-	            color: rgba(255, 255, 255, 0.3); /* Transparente */
-	            text-shadow: none;
-	        }
-	
-	        .back-header-clickable {
-	            flex-shrink: 0;
-	            cursor: pointer;
-	            text-align: center;
-	        }
-
-	        .photo-back {
-	            width: 70px;
-	            height: 70px;
-	            border-radius: 50%;
-	            object-fit: cover;
-	            object-position: center 20%; /* Ajuste para centralizar o rosto (exemplo: 20% de cima para baixo) */
-	            margin: 0 auto 10px;
-	            border: 2px solid rgba(255, 255, 255, 0.4);
-	            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-	        }
-
-        .back-header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .back-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 3px;
-        }
-
-        .back-title {
-            font-size: 11px;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 6px;
-        }
-
-        .back-flip-text {
-            font-size: 10px;
-            color: rgba(255,255,255,0.6);
-        }
-
-        .back-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 4px;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-            overscroll-behavior-x: none;
-            touch-action: pan-y !important;
-            min-height: 0;
-            position: relative;
-	            pointer-events: auto;
-	        }
-
-	        /* Estilização da barra de rolagem para WebKit (Chrome, Safari) */
-	        .back-content::-webkit-scrollbar {
-	            width: 8px; /* Largura da barra de rolagem */
-	            height: 8px;
-	        }
-
-	        .back-content::-webkit-scrollbar-track {
-	            background: rgba(0, 0, 0, 0.3); /* Fundo da trilha */
-	            border-radius: 10px;
-	        }
-
-	        .back-content::-webkit-scrollbar-thumb {
-	            background: #ff69b4; /* Cor do polegar (rosa) */
-	            border-radius: 10px;
-	            border: 2px solid rgba(0, 0, 0, 0.3); /* Borda para dar destaque */
-	        }
-
-	        .back-content::-webkit-scrollbar-thumb:hover {
-	            background: #ff2d90; /* Cor ao passar o mouse */
-	        }
-
-	        /* Força a barra de rolagem a ser sempre visível, conforme solicitado */
-	        /* Isso pode adicionar uma barra cinza em alguns navegadores, mesmo sem conteúdo suficiente, mas garante a visibilidade */
-	        @media (max-width: 600px) {
-	            .back-content {
-	                overflow-y: scroll !important;
-	            }
-	        }
-
-        .about {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .about h3 {
-            font-size: 12px;
-            color: #ff69b4;
-            margin-bottom: 6px;
-        }
-
-        .about p {
-            font-size: 10px;
-            line-height: 1.5;
-            color: rgba(255,255,255,0.9);
-        }
-
-
-
-        .portfolio-section {
-            background: linear-gradient(135deg, rgba(74, 14, 78, 0.4) 0%, rgba(139, 0, 0, 0.4) 100%);
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 105, 180, 0.3);
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.15);
-        }
-
-	        .portfolio-section h3 {
-	            font-size: 13px;
-            color: #ff69b4;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
-            text-align: center;
-        }
-
-	        .social-grid {
-	            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-	        .social-btn {
-	            padding: 10px 8px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-	            position: relative;
-	            overflow: hidden;
-	        }
-	
-	        .highlight-phrase {
-	            text-align: center;
-	            font-size: 12px;
-	            font-style: italic;
-	            color: #ff69b4; /* Cor de destaque */
-	            margin: 15px 0 10px;
-	            padding: 5px 0;
-	            border-top: 1px solid rgba(255, 105, 180, 0.2);
-	            border-bottom: 1px solid rgba(255, 105, 180, 0.2);
-	            text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
-	            display: flex;
-	            flex-direction: column;
-	            line-height: 1.2;
-	            font-weight: bold;
-	        }
-	        .highlight-phrase span:first-child {
-	            font-size: 13px;
-	        }
-	        .highlight-phrase span:last-child {
-	            font-size: 11px;
-	            font-weight: normal;
-	        }
-	
-	        .site-button {
-	            display: block;
-	            width: 80%; /* Diminuindo a largura */
-	            margin: 5px auto 0; /* Reduzindo a margem superior para aproximar da frase */
-	            padding: 12px;
-	            margin-top: 10px;
-	            background: linear-gradient(90deg, #ff69b4 0%, #8b0000 100%); /* Gradiente chamativo */
-	            color: white;
-	            text-align: center;
-	            text-decoration: none;
-	            border-radius: 8px;
-	            font-size: 14px;
-	            font-weight: bold;
-	            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
-	            transition: all 0.3s ease;
-	            border: none;
-	        }
-	
-	        .site-button:hover {
-	            background: linear-gradient(90deg, #ff85c1 0%, #a00000 100%);
-	            transform: translateY(-2px);
-	            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
-	        }
-	
-	        .site-button:active {
-	            transform: translateY(0);
-	        }
-	
-	        /* Ajuste o gap do back-content para acomodar o novo botão */
-	        .back-content {
-	            gap: 8px; /* Reduzindo o espaçamento entre os elementos */
-	        }
-
-        .social-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .social-btn:hover::before {
-            left: 100%;
-        }
-
-        .social-btn:hover {
-            background: linear-gradient(135deg, rgba(255, 105, 180, 0.3) 0%, rgba(139, 0, 0, 0.3) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
-            border-color: rgba(255, 105, 180, 0.5);
-        }
-
-        .social-btn:active {
-            transform: translateY(0);
-        }
-
-        .copy-btn {
-            grid-column: span 2;
-            padding: 12px;
-            background: linear-gradient(135deg, rgba(139, 0, 0, 0.6) 0%, rgba(74, 14, 78, 0.6) 100%);
-            color: white;
-            border: 1px solid rgba(255, 105, 180, 0.4);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .copy-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .copy-btn:hover::before {
-            left: 100%;
-        }
-
-        .copy-btn:hover {
-            background: linear-gradient(135deg, rgba(139, 0, 0, 0.8) 0%, rgba(74, 14, 78, 0.8) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
-        }
-
-        .copy-btn:active {
-            transform: translateY(0);
-        }
-
-        .back-content {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 20, 147, 0.5) rgba(0, 0, 0, 0.2);
-        }
-
-        .back-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .back-content::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-        }
-
-        .back-content::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #ff69b4 0%, #8b0000 100%);
-            border-radius: 6px;
-        }
-
-        .back-content::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #ff85c1 0%, #a00000 100%);
-        }
-
-        @media (max-width: 360px) {
-            .flip-card {
-                width: 290px;
-                height: 480px;
-            }
-            .flip-card-back { padding: 16px; }
-            .photo-back { width: 60px; height: 60px; }
-            .about p { font-size: 9px; }
-        }
-    </style>
+.site-button{
+display:block;
+width:80%;
+margin:0 auto;
+padding:12px;
+text-align:center;
+background:linear-gradient(90deg,#ff69b4,#8b0000);
+color:#fff;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+}
+</style>
 </head>
+
 <body>
-    <div id="particles"></div>
 
-    <div class="flip-card" id="flipCard">
-        <div class="flip-card-inner">
-	            <div class="flip-card-front" onclick="flipCard()">
-	                <div class="copy-link-indicator"></div>
+<div class="flip-card" id="flipCard">
+<div class="flip-card-inner">
 
-                <img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/main/ale.jpeg" alt="Alexia Melusine" class="photo-front">
-                <div class="front-overlay">
-                    <h1 class="name-overlay">Alexia Melusine 🌹</h1>
-                    <p class="title-overlay">Criadora de conteúdo</p>
-                    <div class="visit-counter">
-                        👁️ <span id="contador">0</span> visitas
-                    </div>
-                    <p class="touch-overlay">Toque para virar</p>
-                </div>
-            </div>
-	            <div class="flip-card-back">
-	                <div class="copy-link-back-indicator" onclick="copyLink(event)"></div>
-	                <div class="back-header-clickable" onclick="flipCard()">
-                    <img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/main/ale.jpeg" alt="Alexia Melusine" class="photo-back">
-                    <div class="back-header">
-                        <h1 class="back-name">Alexia Melusine</h1>
-                        <p class="back-title">Criadora de conteúdo</p>
-                        <p class="back-flip-text">Toque para virar</p>
-                    </div>
-                </div>
-                <div class="back-content" id="backContent">
+<!-- FRENTE -->
+<div class="flip-card-front" onclick="flipCard()">
+<img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/refs/heads/main/Imagine_1410952850621807.jpg"
+     alt="Alexia Melusine" class="photo-front">
 
-                    
+<div class="front-overlay">
+<h1 class="name-overlay">Alexia Melusine 🌹</h1>
+<p class="title-overlay">Criadora de conteúdo</p>
+<div class="visit-counter">👁️ <span id="contador">--</span> visitas</div>
+<p class="touch-overlay">Toque para virar</p>
+</div>
+</div>
 
-                    
-                    <div class="portfolio-section">
-                        <h3>🔗 Redes Sociais</h3>
-                        <div class="social-grid">
-                            <a href="https://www.kwai.com/@AlexiaRosadeFogo" target="_blank" class="social-btn" onclick="event.stopPropagation()">✨ Kwai</a>
-                            <a href="https://www.youtube.com/@almasdepombagira" target="_blank" class="social-btn" onclick="event.stopPropagation()">▶️ YouTube</a>
-                            <a href="https://www.instagram.com/almasdepombagira/?igsh=Y3VocnA2aDQxYjlw" target="_blank" class="social-btn" onclick="event.stopPropagation()">📸 Instagram</a>
-                            <a href="https://www.tiktok.com/@almasdepombagira?lang=pt-BR" target="_blank" class="social-btn" onclick="event.stopPropagation()">🎶 TikTok</a>
-                            <a href="https://t.me/pomba_giras" target="_blank" class="social-btn" onclick="event.stopPropagation()">✈️ Telegram</a>
-                            <a href="https://whatsapp.com/channel/0029VbBs2AnJkK7J9J0nLr2G" target="_blank" class="social-btn" onclick="event.stopPropagation()">💬 WhatsApp</a>
+<!-- VERSO -->
+<div class="flip-card-back" onclick="flipCard()">
 
-                        </div>
-                    </div>
+<img src="https://raw.githubusercontent.com/alexialuzdeferro/Business-Card/refs/heads/main/Imagine_1410952850621807.jpg"
+     alt="Alexia Melusine" class="photo-back">
 
-                    <p class="highlight-phrase">
-                        <span>"QUEM TEM FÉ ,TEM TUDO."</span>
-                        <span>"QUEM NÃO TEM,ME RESPEITA."</span>
-                    </p>
+<div class="back-header">
+<div class="back-name">Alexia Melusine</div>
+<div class="back-title">Criadora de conteúdo</div>
+<div class="visit-counter">👁️ <span id="contadorBack">--</span> visitas</div>
+</div>
 
-                    <a href="https://bio.site/AlmasdePombagira" target="_blank" class="site-button" onclick="event.stopPropagation()">
-                        Acesse Meu Site Oficial
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="back-content">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<div class="portfolio-section">
+<h3>🔗 Redes Sociais</h3>
+<div class="social-grid">
+<a class="social-btn" href="https://www.kwai.com/@AlexiaRosadeFogo" target="_blank">Kwai</a>
+<a class="social-btn" href="https://www.youtube.com/@almasdepombagira" target="_blank">YouTube</a>
+<a class="social-btn" href="https://www.instagram.com/almasdepombagira" target="_blank">Instagram</a>
+<a class="social-btn" href="https://www.tiktok.com/@almasdepombagira" target="_blank">TikTok</a>
+<a class="social-btn" href="https://t.me/pomba_giras" target="_blank">Telegram</a>
+<a class="social-btn" href="https://whatsapp.com/channel/0029VbBs2AnJkK7J9J0nLr2G" target="_blank">WhatsApp</a>
+</div>
+</div>
 
-    <script>
-        const SUPABASE_URL = "https://qvbjwzszdijhydgcqvyu.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Ymp3enN6ZGlqaHlkZ2Nxdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzMjA3NDQsImV4cCI6MjA4MDg5Njc0NH0.w__h1N2owBQC5HDedmCjRX4IPcXODs_Kc5RyfYeHk_g";
+<div class="highlight-phrase">
+“QUEM TEM FÉ, TEM TUDO.<br>QUEM NÃO TEM, ME RESPEITA.”
+</div>
 
-        let client;
+<a href="https://bio.site/AlmasdePombagira" target="_blank" class="site-button">
+Acesse Meu Site Oficial
+</a>
 
-        function initSupabase() {
-            try {
-                client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                return true;
-            } catch (error) {
-                console.error('Erro ao inicializar Supabase:', error);
-                return false;
-            }
-        }
+</div>
+</div>
 
-        async function handleVisitCounter() {
-            if (!client) {
-                document.getElementById('contador').innerText = '--';
-                return;
-            }
+</div>
+</div>
 
-            try {
-                await client.from("page_visits").insert([{ route: "business-card" }]);
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-                const { count, error } = await client
-                    .from("page_visits")
-                    .select("*", { count: "exact", head: true })
-                    .eq("route", "business-card");
+<script>
+const SUPABASE_URL="https://qvbjwzszdijhydgcqvyu.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Ymp3enN6ZGlqaHlkZ2Nxdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzMjA3NDQsImV4cCI6MjA4MDg5Njc0NH0.w__h1N2owBQC5HDedmCjRX4IPcXODs_Kc5RyfYeHk_g";
 
-                if (!error && count !== null) {
-                    document.getElementById('contador').innerText = count;
-                } else {
-                    document.getElementById('contador').innerText = '--';
-                }
-            } catch (error) {
-                console.error('Erro no contador:', error);
-                document.getElementById('contador').innerText = '--';
-            }
-        }
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-        function flipCard() {
-            document.getElementById('flipCard').classList.toggle('flipped');
-        }
+async function contadorVisitas(){
+await client.from("page_visits").insert([{route:"business-card"}]);
+const {count}=await client
+.from("page_visits")
+.select("*",{count:"exact",head:true})
+.eq("route","business-card");
 
-        function copyLink(event) {
-            event.stopPropagation();
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const element = event.target;
-                const originalContent = element.innerHTML;
-                element.innerHTML = '✅';
-                setTimeout(() => element.innerHTML = originalContent, 2000);
-            });
-        }
+document.getElementById("contador").innerText=count ?? "--";
+document.getElementById("contadorBack").innerText=count ?? "--";
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const backContent = document.getElementById('backContent');
-            const flipCardEl = document.getElementById('flipCard');
-            
-            if (backContent) {
-                // Impede cliques de virar o cartão
-                backContent.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
+function flipCard(){
+document.getElementById("flipCard").classList.toggle("flipped");
+}
 
-                // Variáveis de controle de toque
-                let startY = 0;
-                let startX = 0;
-                let currentScrollTop = 0;
+window.addEventListener("load",contadorVisitas);
+</script>
 
-                backContent.addEventListener('touchstart', function(e) {
-                    startY = e.touches[0].clientY;
-                    startX = e.touches[0].clientX;
-                    currentScrollTop = backContent.scrollTop;
-                }, { passive: true });
-
-                backContent.addEventListener('touchmove', function(e) {
-                    // Sempre permite o scroll dentro do backContent
-                    e.stopPropagation();
-                }, { passive: true });
-
-                backContent.addEventListener('touchend', function(e) {
-                    e.stopPropagation();
-                }, { passive: true });
-            }
-
-            // Impede que toques na área do verso virem o cartão
-            const flipCardBack = document.querySelector('.flip-card-back');
-            if (flipCardBack) {
-                flipCardBack.addEventListener('touchstart', function(e) {
-                    // Apenas vira se tocar no header
-                    if (!e.target.closest('.back-content') && !e.target.closest('.social-btn') && !e.target.closest('.copy-btn')) {
-                        return;
-                    }
-                    e.stopPropagation();
-                }, { passive: true });
-            }
-        });
-
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'particle ' + (Math.random() > 0.5 ? 'rose' : 'star');
-            particle.innerHTML = particle.classList.contains('rose') ? '🌹' : '⭐';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 2 + 's';
-            document.getElementById('particles').appendChild(particle);
-            setTimeout(() => particle.remove(), 12000);
-        }
-
-        window.addEventListener('load', () => {
-            setInterval(createParticle, 800);
-            for (let i = 0; i < 5; i++) setTimeout(createParticle, i * 150);
-
-            if (initSupabase()) {
-                handleVisitCounter();
-            }
-        });
-    </script>
 </body>
 </html>
